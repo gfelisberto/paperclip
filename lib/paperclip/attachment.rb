@@ -418,9 +418,13 @@ module Paperclip
       return if @queued_for_write[:original].nil?
 
       instance.run_paperclip_callbacks(:post_process) do
+        threads = []
         instance.run_paperclip_callbacks(:"#{name}_post_process") do
-          post_process_styles(*style_args)
+          threads << Thread.new do
+            post_process_styles(*style_args)
+          end
         end
+        threads.each(&:join)
       end
     end
 
