@@ -7,6 +7,7 @@ module Paperclip
       end
 
       def validate_each(record, attribute, value)
+        base_attribute = attribute.to_sym
         attribute = "#{attribute}_content_type".to_sym
         value = record.send :read_attribute_for_validation, attribute
 
@@ -14,6 +15,10 @@ module Paperclip
 
         validate_whitelist(record, attribute, value)
         validate_blacklist(record, attribute, value)
+
+        if record.errors.include? attribute
+          record.errors.add base_attribute, record.errors[attribute]
+        end
       end
 
       def validate_whitelist(record, attribute, value)
